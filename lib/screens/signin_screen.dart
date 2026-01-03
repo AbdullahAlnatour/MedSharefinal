@@ -13,17 +13,17 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignInScreen> {
-  final _formkey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
-  final _signinEmailCtrl = TextEditingController();
-  final _signinPassCtrl = TextEditingController();
+  final _signInEmailCtrl = TextEditingController();
+  final _signInPassCtrl = TextEditingController();
 
   bool _signupShowPass = false;
 
   @override
   void dispose() {
-    _signinEmailCtrl.dispose();
-    _signinPassCtrl.dispose();
+    _signInEmailCtrl.dispose();
+    _signInPassCtrl.dispose();
     super.dispose();
   }
 
@@ -69,7 +69,7 @@ class _SignUpScreenState extends State<SignInScreen> {
                     ),
                     child: Column(
                       children: [
-                        SizedBox(height: height * 0.006),
+                        SizedBox(height: height * 0.005),
                         _signupBuildForm(context),
                         SizedBox(height: height * 0.02),
                         _signupBuildActions(context),
@@ -131,15 +131,14 @@ class _SignUpScreenState extends State<SignInScreen> {
 
   Widget _signupBuildForm(BuildContext context) {
     return Form(
-      key: _formkey,
+      key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 14),
           CustomTextField(
             label: 'Email',
             hint: 'Enter your email',
-            controller: _signinEmailCtrl,
+            controller: _signInEmailCtrl,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -155,7 +154,7 @@ class _SignUpScreenState extends State<SignInScreen> {
           CustomTextField(
             label: 'Password',
             hint: "Enter your password",
-            controller: _signinPassCtrl,
+            controller: _signInPassCtrl,
             isPassword: true,
             obscure: _signupShowPass,
             onToggleVisibility: () =>
@@ -187,7 +186,7 @@ class _SignUpScreenState extends State<SignInScreen> {
               child: Text(
                 "Forgot password",
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: Colors.blue.shade600,
                   fontSize: 14,
                   decoration: TextDecoration.underline,
                   decorationColor: Colors.grey.shade600,
@@ -281,7 +280,7 @@ class _SignUpScreenState extends State<SignInScreen> {
                   color: Colors.blue.shade800,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  decoration: TextDecoration.underline,
+                  decoration: TextDecoration.underline
                 ),
               ),
             ),
@@ -292,12 +291,12 @@ class _SignUpScreenState extends State<SignInScreen> {
   }
 
   Future<void> _signinOnCreatePressed() async {
-    if (!_formkey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
     try {
       final result = await LoginService().login(
-        email: _signinEmailCtrl.text.trim(),
-        password: _signinPassCtrl.text.trim(),
+        email: _signInEmailCtrl.text.trim(),
+        password: _signInPassCtrl.text.trim(),
       );
 
       if (!mounted) return;

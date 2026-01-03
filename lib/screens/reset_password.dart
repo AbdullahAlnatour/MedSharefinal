@@ -11,7 +11,7 @@ class ResetPasswordScreen extends StatefulWidget {
 }
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final _formkey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   final resetEmailController = TextEditingController();
   bool _showOldPass = false;
   bool _showNewPass = false;
@@ -41,66 +41,69 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       body: Padding(
         padding: const EdgeInsets.all(20),
 
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(height: 14),
-            CustomTextField(
-              label: 'Old Password',
-              controller: _oldPassCtrl,
-              isPassword: true,
-              obscure: _showOldPass,
-              onToggleVisibility: () =>
-                  setState(() => _showOldPass = !_showOldPass),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your old password';
-                }
-                if (value.length < 6) {
-                  return 'Password must be at least 6 characters';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 14),
-            CustomTextField(
-              label: 'New Password',
-              controller: _newPassCtrl,
-              isPassword: true,
-              obscure: _showNewPass,
-              onToggleVisibility: () =>
-                  setState(() => _showNewPass = !_showNewPass),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your new password';
-                }
-                if (value.length < 6) {
-                  return 'Password must be at least 6 characters';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                backgroundColor: primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(height: 14),
+              CustomTextField(
+                label: 'Old Password',
+                controller: _oldPassCtrl,
+                isPassword: true,
+                obscure: _showOldPass,
+                onToggleVisibility: () =>
+                    setState(() => _showOldPass = !_showOldPass),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your old password';
+                  }
+                  if (value.length < 6) {
+                    return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                },
               ),
-              onPressed: () {
-                _onResetPasswordPressed();
-              },
-              child: const Text("Reset Password", style: TextStyle(fontSize: 20)),
-            ),
-          ],
+              const SizedBox(height: 14),
+              CustomTextField(
+                label: 'New Password',
+                controller: _newPassCtrl,
+                isPassword: true,
+                obscure: _showNewPass,
+                onToggleVisibility: () =>
+                    setState(() => _showNewPass = !_showNewPass),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your new password';
+                  }
+                  if (value.length < 6) {
+                    return 'Password must be at least 6 characters';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  _onResetPasswordPressed();
+                },
+                child: const Text("Reset Password", style: TextStyle(fontSize: 20)),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
   Future<void> _onResetPasswordPressed() async {
-    if (!_formkey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
     try {
       await ResetPasswordService().resetPassword(

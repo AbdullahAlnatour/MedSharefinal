@@ -73,7 +73,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     child: Column(
                       children: [
-                        SizedBox(height: height * 0.006),
+                        SizedBox(height: height * 0.005),
                         _signupBuildForm(context),
                         SizedBox(height: height * 0.02),
                         _signupBuildActions(context),
@@ -157,8 +157,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               if (value == null || value.isEmpty) {
                 return 'Please enter your email';
               }
-              if (!value.contains('@g')) {
-                return 'Email must end with @';
+              if (!value.endsWith('@gmail.com')) {
+                return 'Email must end with @gmail.com';
               }
               return null;
             },
@@ -258,7 +258,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     try {
-      final result = await RegisterService().register(
+      await RegisterService().register(
         fullName: _signupNameCtrl.text.trim(),
         email: _signupEmailCtrl.text.trim(),
         password: _signupPassCtrl.text.trim(),
@@ -275,7 +275,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      _signupToast(context, e.toString().replaceFirst('Exception: ', ''));
+      _signupToast(context, ('Invalid Information'));
     }
   }
 

@@ -5,7 +5,6 @@ class ApiClient {
   static final Dio dio = Dio(
     BaseOptions(
       baseUrl: 'http://10.0.2.2:5149/api', // Android Emulator
-      headers: {'Content-Type': 'application/json'},
     ),
   )..interceptors.add(
     InterceptorsWrapper(

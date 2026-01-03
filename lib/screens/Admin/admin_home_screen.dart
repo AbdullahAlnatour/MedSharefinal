@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/screens/Admin/admin_notification_screen.dart';
 
+import '../../core/storage/user_storage.dart';
+
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
 
@@ -10,6 +12,8 @@ class AdminHomeScreen extends StatefulWidget {
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   bool isDonationActive = true;
+  String _fullName = '';
+
   final List<MedicineItem> medicinesdonations = [
     MedicineItem(medicinename: 'Oxycodone', expiry: '26/04'),
     MedicineItem(medicinename: 'Amoxicillin', expiry: '26/06'),
@@ -22,7 +26,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     MedicineItem(medicinename: 'Oxycodone', expiry: '26/08'),
     MedicineItem(medicinename: 'Amoxicillin', expiry: '26/06'),
   ];
-
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
   final List<MedicalItem> medicaldonations = [
     MedicalItem(
       medicalname: 'Wheel chair',
@@ -93,7 +101,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               style: TextStyle(fontSize: 16, color: Colors.black54),
             ),
             Text(
-              "Kareem Saleh",
+              _fullName.isEmpty ? '...' : _fullName,
               style: TextStyle(
                 fontSize: width * 0.065,
                 fontWeight: FontWeight.bold,
@@ -430,6 +438,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         },
       ),
     );
+  }
+  Future<void> _loadUser() async {
+    final name = await UserStorage.getFullName();
+    if (!mounted) return;
+    setState(() {
+      _fullName = name ?? '';
+    });
   }
 }
 

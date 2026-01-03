@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:test_app/widgets/custom_text_field.dart';
+import '../../features/auth/data/drprofile/dr_profile_service.dart';
 
 class DrProfileScreen extends StatefulWidget {
   const DrProfileScreen({super.key});
@@ -13,10 +18,12 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
 
   final _drProfileNameCtrl = TextEditingController();
   final _drProfileEmailCtrl = TextEditingController();
+  File? _selectedImage;
+  String? _drprofileImageUrl;
   /*final _drProfileOldPassCtrl = TextEditingController();
-  final __drProfileNewPassCtrl = TextEditingController();
+  final _drProfileNewPassCtrl = TextEditingController();
   final _drProfileConfirmPassCtrl = TextEditingController();*/
-  /*
+  /* 
   bool _drProfileShowOldPass = false;
   bool _drProfileShowNewPass = false;
   bool _drProfileShowConfirm = false;
@@ -26,11 +33,16 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
     _drProfileNameCtrl.dispose();
     _drProfileEmailCtrl.dispose();
     /*_drProfileOldPassCtrl.dispose();
-    __drProfileNewPassCtrl.dispose();
+    _drProfileNewPassCtrl.dispose();
     _drProfileConfirmPassCtrl.dispose();*/
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -68,16 +80,6 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
                 builder: (context, constraints) {
                   return Column(
                     children: [
-                      const SizedBox(height: 20),
-                      Text(
-                        'Mr. Ahmad Sami',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
                       const SizedBox(height: 5),
                       Expanded(
                         child: SingleChildScrollView(
@@ -89,9 +91,9 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
                           ),
                           child: Column(
                             children: [
-                              SizedBox(height: height * 0.006),
+                              SizedBox(height: height * 0.005),
                               _profileBuildForm(context),
-                              SizedBox(height: height * 0.25),
+                              SizedBox(height: height * 0.31),
                               _profileBuildActions(context),
                               SizedBox(height: height * 0.03),
                             ],
@@ -110,11 +112,11 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
   }
 
   Widget _profileBuildHeader(
-    BuildContext context,
-    double headerH,
-    double width,
-    double height,
-  ) {
+      BuildContext context,
+      double headerH,
+      double width,
+      double height,
+      ) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -126,7 +128,7 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
             'Profile',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 28,
+              fontSize: width * 0.080,
               fontWeight: FontWeight.bold,
               fontFamily: 'Poppins',
             ),
@@ -134,43 +136,54 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
         ),
         Positioned(
           bottom: height * 0.075,
-          child: Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              Container(
-                width: width * 0.45,
-                height: width * 0.45,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white, width: 4),
-                  image: const DecorationImage(
-                    image: AssetImage('assets/images/User_profile.jpg'),
-                    fit: BoxFit.cover,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-              ),
+          child: GestureDetector(
+            onTap: _pickImage,
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  width: width * 0.45,
+                  height: width * 0.45,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white, width: 4),
+                    image: DecorationImage(
+                      image: _selectedImage != null
+                          ? FileImage(_selectedImage!)
+                          : (_drprofileImageUrl != null
+                          ? NetworkImage(
+                        '$_drprofileImageUrl?t=${DateTime.now().millisecondsSinceEpoch}',
+                      )
+                          : const AssetImage('assets/images/no_profile_picture.jpg')
+                      ) as ImageProvider,
 
-              Positioned(
-                right: 6,
-                bottom: 6,
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.white,
-                  child: Icon(
-                    Icons.camera_alt,
-                    size: 18,
-                    color: Colors.black54,
+                      fit: BoxFit.cover,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+
+                Positioned(
+                  right: 6,
+                  bottom: 6,
+                  child: CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Colors.white,
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 18,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -183,6 +196,7 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          SizedBox(height: 5,),
           CustomTextField(
             label: 'Full Name',
             hint: 'Enter your full name',
@@ -205,14 +219,14 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
               if (value == null || value.isEmpty) {
                 return 'Please enter your email';
               }
-              if (!value.endsWith('@gmail.com')) {
-                return 'Email must end with @gmail.com';
+              if (!value.contains('@')) {
+                return 'Email must end with @';
               }
               return null;
             },
           ),
-          const SizedBox(height: 14),
           /*
+          const SizedBox(height: 14),
           CustomTextField(
             label: 'Old Password',
             controller: _drProfileOldPassCtrl,
@@ -233,7 +247,7 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
           const SizedBox(height: 14),
           CustomTextField(
             label: 'New Password',
-            controller: __drProfileNewPassCtrl,
+            controller: _drProfileNewPassCtrl,
             isPassword: true,
             obscure: _drProfileShowNewPass,
             onToggleVisibility: () =>
@@ -260,7 +274,7 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
               if (value == null || value.isEmpty) {
                 return 'Please enter your confirm password';
               }
-              if (value != __drProfileNewPassCtrl.text) {
+              if (value != _drProfileNewPassCtrl.text) {
                 return 'Passwords do not match';
               }
               return null;
@@ -293,14 +307,49 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
     );
   }
 
-  void _profileOnCreatePressed() {
-    if (_formkey.currentState!.validate()) {
-      _profileToast('Saved information!');
+  Future<void> _profileOnCreatePressed() async {
+    if (!_formkey.currentState!.validate()) return;
+    try {
+      MultipartFile? image;
+
+      if (_selectedImage != null) {
+        image = await MultipartFile.fromFile(
+          _selectedImage!.path,
+          filename: 'profile.jpg',
+        );
+      }
+
+      await DrProfileService().updateProfile(
+        fullName: _drProfileNameCtrl.text.trim(),
+        email: _drProfileEmailCtrl.text.trim(),
+        image: image,
+      );
+      await _loadProfile();
+      setState(() {
+        _selectedImage = null;
+      });
+
+      if (!mounted) return;
+      _profileToast(context,'Profile updated successfully!');
+    } catch (e) {
+      if (!mounted) return;
+      if (e is DioException) {
+        print('❌ DIO ERROR');
+        print('Status code: ${e.response?.statusCode}');
+        print('Response data: ${e.response?.data}');
+        print('Request path: ${e.requestOptions.path}');
+        print('Request headers: ${e.requestOptions.headers}');
+      } else {
+        print('❌ UNKNOWN ERROR: $e');
+      }
+      _profileToast(context, 'Failed to update profile');
     }
+
   }
 
-  void _profileToast(String msg) {
-    if (msg == 'Saved information!') {
+
+  void _profileToast(BuildContext context, String msg) {
+    if (msg == 'Profile updated successfully!') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(msg), backgroundColor: Colors.green),
       );
@@ -310,4 +359,30 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
       ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
     }
   }
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+  Future<void> _loadProfile() async {
+    final profile = await DrProfileService().getProfile();
+
+    setState(() {
+      _drProfileNameCtrl.text = profile.fullName;
+      _drProfileEmailCtrl.text = profile.email;
+
+      _drprofileImageUrl = profile.profileImageUrl != null
+          ? 'http://10.0.2.2:5149/${profile.profileImageUrl}'
+          : null;
+    });
+  }
+
 }

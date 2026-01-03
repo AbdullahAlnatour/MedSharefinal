@@ -1,5 +1,11 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:test_app/widgets/custom_text_field.dart';
+
+import '../../features/auth/data/Profile/profiel_service.dart';
 
 class AdminProfileScreen extends StatefulWidget {
   const AdminProfileScreen({super.key});
@@ -13,6 +19,8 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
 
   final _adminProfileNameCtrl = TextEditingController();
   final _adminProfileEmailCtrl = TextEditingController();
+  File? _selectedImage;
+  String? _profileImageUrl;
   /*final _adminProfileOldPassCtrl = TextEditingController();
   final _adminProfileNewPassCtrl = TextEditingController();
   final _adminProfileConfirmPassCtrl = TextEditingController();*/
@@ -31,6 +39,11 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -68,16 +81,6 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                 builder: (context, constraints) {
                   return Column(
                     children: [
-                      const SizedBox(height: 20),
-                      Text(
-                        'Dr Kareem Saleh',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
                       const SizedBox(height: 5),
                       Expanded(
                         child: SingleChildScrollView(
@@ -89,9 +92,9 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                           ),
                           child: Column(
                             children: [
-                              SizedBox(height: height * 0.006),
+                              SizedBox(height: height * 0.005),
                               _profileBuildForm(context),
-                              SizedBox(height: height * 0.25),
+                              SizedBox(height: height * 0.31),
                               _profileBuildActions(context),
                               SizedBox(height: height * 0.03),
                             ],
@@ -134,43 +137,54 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
         ),
         Positioned(
           bottom: height * 0.075,
-          child: Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              Container(
-                width: width * 0.45,
-                height: width * 0.45,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white, width: 4),
-                  image: const DecorationImage(
-                    image: AssetImage('assets/images/doctor_profile.jpg'),
-                    fit: BoxFit.cover,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-              ),
+          child: GestureDetector(
+            onTap: _pickImage,
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  width: width * 0.45,
+                  height: width * 0.45,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white, width: 4),
+                    image: DecorationImage(
+                      image: _selectedImage != null
+                          ? FileImage(_selectedImage!)
+                          : (_profileImageUrl != null
+                          ? NetworkImage(
+                        '$_profileImageUrl?t=${DateTime.now().millisecondsSinceEpoch}',
+                      )
+                          : const AssetImage('assets/images/no_profile_picture.jpg')
+                      ) as ImageProvider,
 
-              Positioned(
-                right: 6,
-                bottom: 6,
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.white,
-                  child: Icon(
-                    Icons.camera_alt,
-                    size: 18,
-                    color: Colors.black54,
+                      fit: BoxFit.cover,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+
+                Positioned(
+                  right: 6,
+                  bottom: 6,
+                  child: CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Colors.white,
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 18,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -183,6 +197,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          SizedBox(height: 5,),
           CustomTextField(
             label: 'Full Name',
             hint: 'Enter your full name',
@@ -205,8 +220,8 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
               if (value == null || value.isEmpty) {
                 return 'Please enter your email';
               }
-              if (!value.endsWith('@gmail.com')) {
-                return 'Email must end with @gmail.com';
+              if (!value.endsWith('@medshare.jo')) {
+                return 'Email must end with @medshare.jo';
               }
               return null;
             },
@@ -293,14 +308,41 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     );
   }
 
-  void _profileOnCreatePressed() {
-    if (_formkey.currentState!.validate()) {
-      _profileToast('Saved information!');
+  Future<void> _profileOnCreatePressed() async {
+    if (!_formkey.currentState!.validate()) return;
+    try {
+      MultipartFile? image;
+
+      if (_selectedImage != null) {
+        image = await MultipartFile.fromFile(
+          _selectedImage!.path,
+          filename: 'profile.jpg',
+        );
+      }
+
+      await AdminProfileService().updateProfile(
+        fullName: _adminProfileNameCtrl.text.trim(),
+        email: _adminProfileEmailCtrl.text.trim(),
+        image: image,
+      );
+      await _loadProfile();
+      setState(() {
+        _selectedImage = null;
+      });
+
+      if (!mounted) return;
+      _profileToast(context,'Profile updated successfully!');
+    } catch (e) {
+      if (!mounted) return;
+
+      _profileToast(context, 'Failed to update profile');
     }
+
   }
 
-  void _profileToast(String msg) {
-    if (msg == 'Saved information!') {
+
+  void _profileToast(BuildContext context, String msg) {
+    if (msg == 'Profile updated successfully!') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(msg), backgroundColor: Colors.green),
       );
@@ -310,4 +352,30 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
       ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
     }
   }
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+  Future<void> _loadProfile() async {
+    final profile = await AdminProfileService().getProfile();
+
+    setState(() {
+      _adminProfileNameCtrl.text = profile.fullName;
+      _adminProfileEmailCtrl.text = profile.email;
+
+      _profileImageUrl = profile.profileImageUrl != null
+          ? 'http://10.0.2.2:5149/${profile.profileImageUrl}'
+          : null;
+    });
+  }
+
 }
