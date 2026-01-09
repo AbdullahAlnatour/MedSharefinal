@@ -59,34 +59,38 @@ class _CartScreenState extends State<CartScreen> {
                   return Center(child: Text(snapshot.error.toString()));
                 }
                 final equipmentCartItems = snapshot.data!.equipment
-                    .map((e) => CartItem(
-                  name: e.itemName,
-                  quantity: e.quantity,
-                  image: Icons.medical_services,
-                  donationId: e.donationId,
-                  cartType: 1,
-                ))
+                    .map(
+                      (e) => CartItem(
+                        name: e.itemName,
+                        quantity: e.quantity,
+                        image: Icons.medical_services,
+                        donationId: e.donationId,
+                        cartType: 1,
+                      ),
+                    )
                     .toList();
 
                 final medicineCartItems = snapshot.data!.medicine
-                    .map((e) => CartItem(
-                  name: e.itemName,
-                  quantity: e.quantity,
-                  image: Icons.medication,
-                  donationId: e.donationId,
-                  cartType: 2,
-                ))
+                    .map(
+                      (e) => CartItem(
+                        name: e.itemName,
+                        quantity: e.quantity,
+                        image: Icons.medication,
+                        donationId: e.donationId,
+                        cartType: 2,
+                      ),
+                    )
                     .toList();
 
-
-                if (equipmentCartItems.isEmpty &&
-                    medicineCartItems.isEmpty) {
+                if (equipmentCartItems.isEmpty && medicineCartItems.isEmpty) {
                   return _buildEmptyCart();
                 }
 
                 return SingleChildScrollView(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -171,8 +175,7 @@ class _CartScreenState extends State<CartScreen> {
                 const SizedBox(height: 4),
                 Text(
                   'Quantity: ${item.quantity}',
-                  style:
-                  TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
                 ),
               ],
             ),
@@ -204,14 +207,26 @@ class _CartScreenState extends State<CartScreen> {
                 icon: const Icon(Icons.add_circle_outline),
                 color: const Color(0xFF34AFB7),
                 onPressed: () async {
-                  await _cartService.addToCart(
+                  final ok = await _cartService.addToCart(
                     AddToCartDto(
                       donationId: item.donationId,
                       quantity: 1,
                       cartType: item.cartType,
                     ),
                   );
-                  _reloadCart();
+                  if (ok) {
+                    _reloadCart();
+                  } else {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Failed to add to cart. Try again later.',
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 },
               ),
             ],
