@@ -219,7 +219,14 @@ class _DrHomeScreenState extends State<DrHomeScreen> {
         : equipment.where((item) {
       return item.itemName.toLowerCase().contains(searchQuery);
     }).toList();
-
+    if(equipment.isEmpty){
+      return const Center(
+        child: Text(
+          "You Don't have any equipment donations.",
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
+    }
     const String apiBase = "http://10.0.2.2:5149";
     if (_equipmentLoading) {
       return SizedBox(
@@ -402,7 +409,14 @@ class _DrHomeScreenState extends State<DrHomeScreen> {
         : medicines.where((item) {
       return item.itemName.toLowerCase().contains(searchQuery);
     }).toList();
-
+    if(medicines.isEmpty){
+      return const Center(
+        child: Text(
+          "You Don't have any equipment donations.",
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
+    }
     if (_medicinesLoading) {
       return const Expanded(child: Center(child: CircularProgressIndicator()));
     }

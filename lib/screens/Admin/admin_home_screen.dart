@@ -101,6 +101,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -271,7 +272,25 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     List<dynamic> baseList = isDonationActive
         ? equipmentDonations   // List<AdminDonationRequestedModel>
         : equipmentTakeRequests; // List<AdminTakeDonationRequestModel>
-
+    if(isDonationActive) {
+      if (equipmentDonations.isEmpty) {
+        return const Center(
+          child: Text(
+            "You Don't have any equipment donations.",
+            style: TextStyle(color: Colors.grey),
+          ),
+        );
+      }
+    }else {
+      if (equipmentTakeRequests.isEmpty) {
+        return const Center(
+          child: Text(
+            "You Don't have any equipment requests.",
+            style: TextStyle(color: Colors.grey),
+          ),
+        );
+      }
+    }
     // 2️⃣ تطبيق فلترة البحث
     final filteredList = searchQuery.isEmpty
         ? baseList
@@ -505,6 +524,25 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         ? medicineDonations
         : medicineTakeRequests;
 
+    if(isDonationActive) {
+      if (medicineDonations.isEmpty) {
+        return const Center(
+          child: Text(
+            "You Don't have any medicine donations.",
+            style: TextStyle(color: Colors.grey),
+          ),
+        );
+      }
+    }else {
+      if (medicineTakeRequests.isEmpty) {
+        return const Center(
+          child: Text(
+            "You Don't have any medicine requests.",
+            style: TextStyle(color: Colors.grey),
+          ),
+        );
+      }
+    }
     // 2️⃣ تطبيق الفلترة حسب searchQuery
     final filteredList = searchQuery.isEmpty
         ? baseList
@@ -556,6 +594,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       int requestId,
       bool isUploadRequest,
       int userId) {
+
     return Container(
       margin: EdgeInsets.only(bottom: height * 0.015),
       padding: EdgeInsets.all(width * 0.04),

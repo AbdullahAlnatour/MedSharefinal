@@ -127,12 +127,12 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         "color": const Color(0xff3e4a89),
       },
       {
-        "title": "Donations",
+        "title": "User Requests",
         "percent": percent(_analysis!.donations),
         "color": kTeal,
       },
       {
-        "title": "User Requests",
+        "title": "Donations",
         "percent": percent(_analysis!.userRequests),
         "color": const Color(0xffa2b1ff),
       },

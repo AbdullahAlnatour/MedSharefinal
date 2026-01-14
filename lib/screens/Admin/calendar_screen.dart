@@ -85,7 +85,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               return Theme(
                 data: Theme.of(context).copyWith(
                   colorScheme: const ColorScheme.light(
-                    primary: Color(0xFF34AFB7), // 🔵 اللون الرئيسي (الهيدر + اليوم المحدد)
+                    primary: Colors.blue, // 🔵 اللون الرئيسي (الهيدر + اليوم المحدد)
                     onPrimary: Colors.white,    // لون النص داخل الهيدر
                     onSurface: Colors.black,    // لون النص العام
                   ),
@@ -305,11 +305,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       return Theme(
                         data: Theme.of(context).copyWith(
                           timePickerTheme: const TimePickerThemeData(
-                            dialHandColor: Color(0xFF34AFB7),
+                            dialHandColor: Colors.blue,
                             dialBackgroundColor: Color(0xFFEEF6F6),
-                            hourMinuteColor: Color(0xFF34AFB7),
+                            hourMinuteColor: Colors.blue,
                             hourMinuteTextColor: Colors.white,
-                            dayPeriodColor: Color(0xFF34AFB7),
+                            dayPeriodColor: Colors.blue,
                             dayPeriodTextColor: Colors.white,
                           ),
                           colorScheme: const ColorScheme.light(
