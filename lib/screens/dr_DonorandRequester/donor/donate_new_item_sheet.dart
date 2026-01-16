@@ -57,11 +57,11 @@ class _DonateNewItemSheetState extends State<DonateNewItemSheet> {
   int _mapConditionToEnum(String condition) {
     switch (condition) {
       case "New":
-        return 0;
-      case "Like New":
         return 1;
-      case "Used (Good)":
+      case "Like New":
         return 2;
+      case "Used (Good)":
+        return 3;
       default:
         return 0;
     }
