@@ -18,6 +18,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _signupEmailCtrl = TextEditingController();
   final _signupPassCtrl = TextEditingController();
   final _signupConfirmPassCtrl = TextEditingController();
+  final passwordRegex =
+  RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+  final emailRegex =
+  RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
 
   bool _signupShowPass = false;
   bool _signupShowConfirm = false;
@@ -159,8 +164,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               if (value == null || value.isEmpty) {
                 return 'Please enter your email';
               }
-              if (!value.endsWith('@gmail.com')) {
-                return 'Email must end with @gmail.com';
+              if (!emailRegex.hasMatch(value.trim())) {
+                return 'Enter a valid email address';
               }
               return null;
             },
@@ -178,10 +183,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               if (value == null || value.isEmpty) {
                 return 'Please enter your password';
               }
-              if (value.length < 6) {
-                return 'Password must be at least 6 characters';
+              if (!passwordRegex.hasMatch(value)) {
+                return 'Password must be at least 8 characters and include\n'
+                    'uppercase, lowercase, number, and special character';
               }
-              
               return null;
             },
           ),

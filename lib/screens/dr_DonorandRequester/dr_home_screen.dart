@@ -178,9 +178,17 @@ class _DrHomeScreenState extends State<DrHomeScreen> {
           child: Container(
             height: height * 0.06,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
+
             padding: EdgeInsets.symmetric(horizontal: width * 0.04),
             child: Row(
               children: [
@@ -195,6 +203,8 @@ class _DrHomeScreenState extends State<DrHomeScreen> {
                   decoration: InputDecoration(
                     hintText: 'Search',
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
                   ),
                 ),
                 ),
@@ -412,7 +422,7 @@ class _DrHomeScreenState extends State<DrHomeScreen> {
     if(medicines.isEmpty){
       return const Center(
         child: Text(
-          "You Don't have any equipment donations.",
+          "You Don't have any medicine donations.",
           style: TextStyle(color: Colors.grey),
         ),
       );

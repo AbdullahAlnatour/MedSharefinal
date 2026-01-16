@@ -187,9 +187,16 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           child: Container(
             height: height * 0.06,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(12),
-            ),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
             padding: EdgeInsets.symmetric(horizontal: width * 0.04),
             child: Row(
               children: [
@@ -204,6 +211,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   decoration: InputDecoration(
                     hintText: 'Search',
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
                   ),
                 ),
                 ),
