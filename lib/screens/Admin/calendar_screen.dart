@@ -45,7 +45,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         elevation: 0,
         title: const Text(
           'Calendar',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
         ),
         centerTitle: true,
       ),

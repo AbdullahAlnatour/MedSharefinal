@@ -129,7 +129,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
             'Profile',
             style: TextStyle(
               color: Colors.white,
-              fontSize: width * 0.080,
+              fontSize: width * 0.070,
               fontWeight: FontWeight.bold,
               fontFamily: 'Poppins',
             ),

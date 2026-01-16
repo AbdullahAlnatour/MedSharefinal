@@ -128,7 +128,7 @@ class _DrProfileScreenState extends State<DrProfileScreen> {
             'Profile',
             style: TextStyle(
               color: Colors.white,
-              fontSize: width * 0.080,
+              fontSize: width * 0.070,
               fontWeight: FontWeight.bold,
               fontFamily: 'Poppins',
             ),

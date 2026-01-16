@@ -41,7 +41,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       backgroundColor: const Color(0xfff5f6fa),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text("Analysis"),
+        title: const Text("Analysis",style: TextStyle(fontSize: 24),),
         backgroundColor: kTeal,
         foregroundColor: Colors.white,
         elevation: 0,
